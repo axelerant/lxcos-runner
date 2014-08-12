@@ -1,12 +1,14 @@
 require 'lxc'
 require 'chef'
 require 'chef/knife'
+require 'net/ssh'
 
 #List out all the nodes
 def node_list
   Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
   Chef::Node.list.each do |node|
 	puts node.first
+  containers_in_node(node.first)
   end
 end
 
@@ -21,6 +23,17 @@ end
 #  Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
 #  Chef::Knife.run(%w(ssh 'name:*' -x ubuntu -i /path/to/key "run_number_of_containers")
 #end
+
+# Find number of containers in each node
+def containers_in_node(node_name)
+  Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
+  Net::SSH.start(node_name, 'goatos') do |session|
+    no_of_containers = session.exec!('number_of_containers.rb')
+    puts no_of_containers
+    # if number of containers is equal to 100, provision a new node. 
+    provision_new_node if no_of_containers.to_i == 100
+  end
+end  
 
 def provision_new_node
   # Many of these can go into knife.rb file after some initial tweaking.
