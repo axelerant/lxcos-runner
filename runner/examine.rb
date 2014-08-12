@@ -12,17 +12,6 @@ def node_list
   end
 end
 
-#List out the number of containers irrespective to the state
-
-def number_of_containers
-  c = LXC::list_containers()
-  c.count
-end
-
-#def run_in_all_nodes
-#  Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
-#  Chef::Knife.run(%w(ssh 'name:*' -x ubuntu -i /path/to/key "run_number_of_containers")
-#end
 
 # Find number of containers in each node
 def containers_in_node(node_name)
@@ -62,6 +51,7 @@ def provision_new_node
     "-Z #{REGION}",
     "-x #{USERNAME}",
     "-S #{AWS_KEY_NAME}",
+    "-N #{NODE_NAME}",
     "-i #{AWS_KEY_PATH}",
     "-K #{AWS_ACCESS_KEY_ID}",
     "-A #{AWS_SECRET_ACCESS_KEY}",
