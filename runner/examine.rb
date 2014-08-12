@@ -79,7 +79,7 @@ end
 #so that ir provisions containers in that node
 #end
 
-# fetch random word and write remaining words back to the file except for the random one.
+# fetch random word and write remaining words back to the dictionary except for the random one.
 def node_name
   words = File.open("/home/tapan/Axelerant-Workspace/lxcos-runner/test.rb", "r").to_a
   random_word = words.sample
