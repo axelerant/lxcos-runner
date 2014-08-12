@@ -41,7 +41,7 @@ def provision_new_node
   AWS_SECRET_ACCESS_KEY = "your-aws-secret-access-key"
 
   # Node details
-  NODE_NAME         = "node1.example.com" //Choose from a dictionary of pre defined hostnames
+  NODE_NAME         = node_name //Choose from a dictionary of pre defined hostnames
   INSTANCE_SIZE     = "t1.micro"  //For initial testing later to a large instance
   EBS_ROOT_VOL_SIZE = 30   # in GB
   REGION            = "us-east-1b"
@@ -79,3 +79,20 @@ end
 #so that ir provisions containers in that node
 #end
 
+# fetch random word and write remaining words back to the dictionary except for the random one.
+def node_name
+  words = File.open("/dictionary.rb", "r").to_a
+  random_word = words.sample
+  words_remaining = words - [random_word]
+
+  if words.empty?
+    puts "Dictionary is empty."
+  else
+    dictionary = File.open("/dictionary.rb", "w")
+    words_remaining.each do |word|
+      dictionary.write(word)
+    end  
+    dictionary.close  
+    "#{random_word}.lxcos.io"
+  end
+end
