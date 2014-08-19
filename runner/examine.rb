@@ -11,7 +11,7 @@ ActiveRecord::Base.establish_connection(
   username: 'root',
   password: 'root')
 
-class Node 
+class Node < ActiveRecord::Base
   #List out all the nodes
   def node_list
     Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
@@ -35,20 +35,6 @@ class Node
 
   def provision_new_node
     # Many of these can go into knife.rb file after some initial tweaking.
-    # AWS_ACCESS_KEY_ID     =  "AKIAJ5A4KW3VVHLFHJEQ" #"your-aws-access-key-id"
-    # AWS_SECRET_ACCESS_KEY =  "lzYt32p5oJb6ezk/D3OK4Xri3ZMVic5dg2A9XFr5"  #"your-aws-secret-access-key"
-
-    # # Node details
-    # NODE_NAME         = node_name #Choose from a dictionary of pre defined hostnames
-    # INSTANCE_SIZE     = "t1.micro"  #For initial testing later to a large instance
-    # EBS_ROOT_VOL_SIZE = 30   # in GB
-    # REGION            = "us-east-1b"
-    # AMI_NAME          = "ami-7050ae18" #Use this prebaked AMI
-    # SECURITY_GROUP    = "goatbase"
-    # RUN_LIST          = "role[lxcosbase]"
-    # USERNAME          = "ubuntu"
-    # AWS_KEY_NAME	  = "medhuec2" #Key name on the runner machine
-    # AWS_KEY_PATH	  = "medhuec2.pem" #Full path of the key
 
     aws_access_key_id = "AKIAJ5A4KW3VVHLFHJEQ" #"your-aws-access-key-id"
     aws_secret_access_key = "lzYt32p5oJb6ezk/D3OK4Xri3ZMVic5dg2A9XFr5"  #"your-aws-secret-access-key"
@@ -68,19 +54,6 @@ class Node
 
     #Command to provision the instance
     provision_cmd = [
-      # "knife ec2 server create",
-      # "-r #{RUN_LIST}",
-      # "-I #{AMI_NAME}",
-      # "--flavor #{INSTANCE_SIZE}",
-      # "-G #{SECURITY_GROUP}",
-      # "-Z #{REGION}",
-      # "-x #{USERNAME}",
-      # "-S #{AWS_KEY_NAME}",
-      # "-N #{NODE_NAME}",
-      # "-i #{AWS_KEY_PATH}",
-      # "-K #{AWS_ACCESS_KEY_ID}",
-      # "-A #{AWS_SECRET_ACCESS_KEY}",
-      # "--ebs-size #{EBS_ROOT_VOL_SIZE}"
       "knife ec2 server create",
       "-r #{run_list}",
       "-I #{ami_name}",
@@ -98,6 +71,16 @@ class Node
 
 
     # collect IP address
+    ip_address = get_ip_address(provision_cmd)
+    
+    #Provision it
+    status = system(provision_cmd) ? 0 : -1
+    insert_node(node_name, ip_address) if status == 0
+    exit status
+  end
+
+  # fetch ip adddress
+  def get_ip_address(provision_cmd)
     ip_addr = nil
     IO.popen(provision_cmd) do |pipe|
       puts "Provisioning new node"
@@ -112,34 +95,24 @@ class Node
         puts e.message
       end
     end
-
-    #Provision it
-
-    status = system(provision_cmd) ? 0 : -1
-    create("#{NODE_NAME}", ip_addr) if status == 0
-    exit status
-  end
-
-  #def intimate_node
-  #Intimate the current active node to webapp(projsapce)
-  #so that ir provisions containers in that node
-  #end
+    ip_addr
+  end  
 
   # fetch random word and write remaining words back to the dictionary except for the random one.
   def name
-    words = File.open("/dictionary.rb", "r").to_a
+    words = File.open("~/dictionary.rb", "r").to_a
     random_word = words.sample
     words_remaining = words - [random_word]
 
     if words.empty?
       puts "Dictionary is empty."
     else
-      dictionary = File.open("/dictionary.rb", "w")
+      dictionary = File.open("~/dictionary.rb", "w")
       words_remaining.each do |word|
         dictionary.write(word)
       end  
       dictionary.close  
-      "#{random_word}.lxcos.io"
+      random_word.chomp.concat(".lxcos.io")
     end
   end
 
@@ -149,6 +122,14 @@ class Node
     puts "Node #{node.name} is #{status} and it\'s IP address is #{node.ip_address}."
   end
 
+  #def intimate_node
+  #Intimate the current active node to webapp(projsapce)
+  #so that ir provisions containers in that node
+  #end
+
+
 end
+
+Node.new.insert_node("nostalgic", "192.168.1.10")
 
 
