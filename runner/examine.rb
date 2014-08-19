@@ -130,6 +130,6 @@ class Node < ActiveRecord::Base
 
 end
 
-Node.new.insert_node("nostalgic", "192.168.1.10")
+Node.new.node_list
 
 
