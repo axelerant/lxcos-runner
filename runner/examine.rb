@@ -36,8 +36,8 @@ class Node < ActiveRecord::Base
   def provision_new_node
     puts "Provisioning new node"
     # Many of these can go into knife.rb file after some initial tweaking.
-    aws_access_key_id = "AKIAJ5A4KW3VVHLFHJEQ" #"your-aws-access-key-id"
-    aws_secret_access_key = "lzYt32p5oJb6ezk/D3OK4Xri3ZMVic5dg2A9XFr5"  #"your-aws-secret-access-key"
+    aws_access_key_id = "your-aws-access-key-id"
+    aws_secret_access_key = "your-aws-secret-access-key"
 
     #Node details
     node_name = name
@@ -74,7 +74,7 @@ class Node < ActiveRecord::Base
 
     #Provision it
     status = system(provision_cmd) ? 0 : -1
-    insert_node(node_name, ip_address) if status == 0
+    insert_node("#{node_name}", "#{ip_address}") if status == 0
     exit status
   end
 
@@ -123,7 +123,7 @@ class Node < ActiveRecord::Base
 
   def insert_node(node_name, ip_addr)
     node = Node.create(name: node_name, ip_address: ip_addr, status: 'active')
-    puts "Node #{node.name} is #{status} and it\'s IP address is #{node.ip_address}."
+    puts "Node #{node.name} is #{node.status} and it\'s IP address is #{node.ip_address}."
   end
 
 end
