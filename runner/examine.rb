@@ -21,7 +21,7 @@ class Node < ActiveRecord::Base
     end
   end
 
-
+  
   # Find number of containers in each node
   def containers_in_node(node_name)
     Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
@@ -69,32 +69,26 @@ class Node < ActiveRecord::Base
     ].join(" ")
 
 
-    # collect IP address
-    ip_address = get_ip_address(provision_cmd)
+    # # collect IP address
+    # ip_addr = nil
+    # IO.popen(provision_cmd) do |pipe|
+    #   puts "Provisioning new node"
+    #   begin
+    #     while line = pipe.readline
+    #       if line =~ /^Public IP Address: (.*)$/
+    #         ip_addr = $1.strip
+    #         break
+    #       end
+    #     end
+    #   rescue EOFError => e
+    #     puts e.message
+    #   end
+    # end
 
     #Provision it
     status = system(provision_cmd) ? 0 : -1
-    insert_node("#{node_name}", "#{ip_address}") if status == 0
+    insert_node(node_name) if status == 0
     exit status
-  end
-
-  # fetch ip adddress
-  def get_ip_address(provision_cmd)
-    ip_addr = nil
-    IO.popen(provision_cmd) do |pipe|
-      puts "Provisioning new node"
-      begin
-        while line = pipe.readline
-          if line =~ /^Public IP Address: (.*)$/
-            ip_addr = $1.strip
-            break
-          end
-        end
-      rescue EOFError => e
-        puts e.message
-      end
-    end
-    ip_addr
   end
 
   #def intimate_node
@@ -121,9 +115,12 @@ class Node < ActiveRecord::Base
   end
 
 
-  def insert_node(node_name, ip_addr)
-    node = Node.create(name: node_name, ip_address: ip_addr, status: 'active')
-    puts "Node #{node.name} is #{node.status} and it\'s IP address is #{node.ip_address}."
+  def insert_node(node_name)
+    Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
+    node = Chef::Node.load(node_name)
+    Node.create(name: node_name, ip_address: node.ipaddress, status: 'active')
+    # puts "Node #{node.name} is #{node.status} and it\'s IP address is #{node.ip_address}."
+    # change data type of name column 
   end
 
 end
