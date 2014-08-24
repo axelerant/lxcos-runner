@@ -2,22 +2,14 @@ require 'lxc'
 require 'chef'
 require 'chef/knife'
 require 'net/ssh'
-require 'active_record'
 
-ActiveRecord::Base.establish_connection(
-  adapter: 'mysql',
-  host: 'localhost',
-  database: 'lxdb1',
-  username: 'root',
-  password: 'root')
-
-class Node < ActiveRecord::Base
+class Node 
   #List out all the nodes
   def node_list
     Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
     Chef::Node.list.each do |node|
       puts node.first
-    containers_in_node(node.first)
+      containers_in_node(node.first)
     end
   end
 
@@ -28,7 +20,7 @@ class Node < ActiveRecord::Base
     Net::SSH.start(node_name, 'goatos') do |session|
       no_of_containers = session.exec!('number_of_containers.rb')
       puts no_of_containers
-      # if number of containers is equal to 100, provision a new node. 
+      # if number of containers is greater than equal to 100, provision a new node. 
       provision_new_node if no_of_containers.to_i >= 100
     end
   end
@@ -50,6 +42,7 @@ class Node < ActiveRecord::Base
     username = "ubuntu"
     aws_key_name = "medhuec2" #Key name on the runner machine
     aws_key_path = "/home/ubuntu/medhuec2.pem" #Full path of the key
+    # tag = "active"
 
     #Command to provision the instance
     provision_cmd = [
@@ -66,6 +59,7 @@ class Node < ActiveRecord::Base
       "-A #{aws_access_key_id}",
       "-K #{aws_secret_access_key}",
       "--ebs-size #{ebs_root_vol_size}"
+      # "-T active=#{tag}"
     ].join(" ")
 
 
@@ -87,7 +81,6 @@ class Node < ActiveRecord::Base
 
     #Provision it
     status = system(provision_cmd) ? 0 : -1
-    insert_node(node_name) if status == 0
     exit status
   end
 
@@ -114,13 +107,11 @@ class Node < ActiveRecord::Base
     end
   end
 
-
-  def insert_node(node_name)
+  # check if node is active
+  def is_active?(node_name)
     Chef::Config.from_file(File.expand_path('~/.chef/knife.rb'))
     node = Chef::Node.load(node_name)
-    Node.create(name: node_name, ip_address: node.ipaddress, status: 'active')
-    # puts "Node #{node.name} is #{node.status} and it\'s IP address is #{node.ip_address}."
-    # change data type of name column 
+    node.tags.include?('active')
   end
 
 end
