@@ -2,7 +2,7 @@ module Lxcos
   module Runner
     class Container
       # attr_accessor :name, :details
-      attr_accessor :name, :type, :memory, :cpus
+      attr_accessor :name, :type, :memory, :cpus, :details
       
       def initialize(name, type, memory, cpus)
           @name = name
