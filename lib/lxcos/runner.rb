@@ -1,4 +1,8 @@
 require "lxcos/runner/version"
+require 'lxc'
+require 'chef'
+require 'chef/knife'
+require 'net/ssh'
 
 module Lxcos
   module Runner
@@ -18,3 +22,4 @@ end
 
 require "lxcos/runner/node"
 require "lxcos/runner/container"
+
