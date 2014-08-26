@@ -58,6 +58,9 @@ module Lxcos
       def self.create_container(name)
         #create a container in a node
         #should return details of the container
+        @new_container.create_and_start
+        @new_container.set_cgroup_limits
+        @new_container.attach
       end
 
       # fetch random word and write remaining words back to the dictionary except for the random one.

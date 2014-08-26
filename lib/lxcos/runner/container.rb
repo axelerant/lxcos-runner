@@ -9,8 +9,8 @@ module Lxcos
           @type = type
           @memory = memory
           @cpus = cpus
-          container = new_container(@type)
-          container.clone(@name, 
+          @new_container = new_container(@type)
+          @new_container.clone(@name, 
             flags: LXC::LXC_CLONE_SNAPSHOT, bdev_type: 'overlayfs')
       end
 
