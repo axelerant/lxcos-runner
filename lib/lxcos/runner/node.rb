@@ -58,10 +58,6 @@ module Lxcos
       def self.create_container(name)
         #create a container in a node
         #should return details of the container
-        Lxcos::Runner::Container.
-        container = new_container(@type)
-          container.clone(@name, 
-            flags: LXC::LXC_CLONE_SNAPSHOT, bdev_type: 'overlayfs')
       end
 
       # fetch random word and write remaining words back to the dictionary except for the random one.
