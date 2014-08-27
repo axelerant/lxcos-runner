@@ -5,7 +5,6 @@ module Lxcos
       attr_accessor :name, :type, :memory, :cpus, :details
       
       def initialize(name, type, memory, cpus)
-          if can_create_container?
             @name = name
             @type = type
             @memory = memory
@@ -16,9 +15,6 @@ module Lxcos
             create_and_start
             set_cgroup_limits
             attach            
-          else
-            raise "Not allowed to create container"
-          end 
       end
 
 
@@ -46,17 +42,6 @@ module Lxcos
       def create
         @details = Node.create_container(@name)
       end
-
-      def can_create_container?
-        nodes = Lxcos::Runner::Node.all
-        nodes.each do |node|
-          active = Lxcos::Runner::Node.is_active?(node.first) 
-          no_of_containers = Lxcos::Runner::Node.number_of_containers(node.first) 
-
-          active & no_of_containers >= 100
-        end
-      end
-
     end
   end
 end
