@@ -1,8 +1,4 @@
 require "lxcos/runner/version"
-require 'lxc'
-require 'chef'
-require 'chef/knife'
-require 'net/ssh'
 
 module Lxcos
   module Runner

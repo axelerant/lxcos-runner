@@ -1,3 +1,8 @@
+require 'lxc'
+require 'chef'
+require 'chef/knife'
+require 'net/ssh'
+
 module Lxcos
   module Runner
     module Node
@@ -55,9 +60,14 @@ module Lxcos
         exit status
       end
 
-      def self.create_container(name)
+      def self.create_container(node_name)
         #create a container in a node
         #should return details of the container
+        if self.is_active?(node_name)
+          Net::SSH.start(node_name, 'goatos') do |session|
+            session.exec!('container.rb')
+          end
+        end
       end
 
       # fetch random word and write remaining words back to the dictionary except for the random one.
@@ -87,6 +97,4 @@ module Lxcos
 
   end
 end
-
-
 

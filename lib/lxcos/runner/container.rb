@@ -5,16 +5,16 @@ module Lxcos
       attr_accessor :name, :type, :memory, :cpus, :details
       
       def initialize(name, type, memory, cpus)
-            @name = name
-            @type = type
-            @memory = memory
-            @cpus = cpus
-            new_container = new_container(@type)
-            new_container.clone(@name, 
-              flags: LXC::LXC_CLONE_SNAPSHOT, bdev_type: 'overlayfs')
-            create_and_start
-            set_cgroup_limits
-            attach            
+        @name = name
+        @type = type
+        @memory = memory
+        @cpus = cpus
+        new_container = new_container(@type)
+        new_container.clone(@name, 
+          flags: LXC::LXC_CLONE_SNAPSHOT, bdev_type: 'overlayfs')
+        create_and_start
+        set_cgroup_limits
+        attach            
       end
 
 
