@@ -6,9 +6,14 @@ require 'net/ssh'
 module Lxcos
   module Runner
     module Node
+
       #List out all the nodes
       def self.all
         Chef::Node.list
+      end
+
+      def self.current
+        active_node = all
       end
 
       # Find number of containers in each node

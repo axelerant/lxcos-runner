@@ -14,7 +14,7 @@ end
 
 
 #chef_config
-
+Lxcos::Runner.chef_config_file("~/.chef/knife.rb");
 
 require "lxcos/runner/node"
 require "lxcos/runner/container"
