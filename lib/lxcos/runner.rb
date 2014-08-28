@@ -2,6 +2,10 @@ require "lxcos/runner/version"
 
 module Lxcos
   module Runner
+require 'lxc'
+require 'chef'
+require 'chef/knife'
+require 'net/ssh'
     @config = {}
 
     def self.chef_config_file(file_name)

@@ -1,7 +1,3 @@
-require 'lxc'
-require 'chef'
-require 'chef/knife'
-require 'net/ssh'
 
 module Lxcos
   module Runner
@@ -13,7 +9,14 @@ module Lxcos
       end
 
       def self.current
-        active_node = all
+        active_node = all.first
+	total_containers = number_of_containers(active_node[0])
+	if total_containers == 100
+		create_new_node
+	end
+
+	puts active_node
+	active_node[0]
       end
 
       # Find number of containers in each node
@@ -23,7 +26,7 @@ module Lxcos
         end
       end
 
-      def self.create
+      def self.create_new_node
         # Many of these can go into knife.rb file after some initial tweaking.
         aws_access_key_id = "your-aws-access-key-id"
         aws_secret_access_key = "your-aws-secret-access-key"

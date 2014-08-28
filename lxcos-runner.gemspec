@@ -22,5 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "rake"
   spec.add_runtime_dependency "chef"
   spec.add_runtime_dependency "net-ssh"
+  spec.add_runtime_dependency "lxc"
+spec.add_runtime_dependency "knife-ec2"
   
 end

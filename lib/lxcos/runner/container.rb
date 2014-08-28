@@ -12,11 +12,12 @@ module Lxcos
 
       def create
         active_node = Node.current
+	Net::SSH.start(active_node, 'goatos') do |session|
+          session.exec!("create_container.rb #{name} #{type} #{memory} #{cpus}")
+        end
+
       end
  
-      def create
-        @details = Node.create_container(@name)
-      end
     end
   end
 end
