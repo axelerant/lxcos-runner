@@ -11,8 +11,9 @@ module Lxcos
       def self.current
         active_node = all.first
 	total_containers = number_of_containers(active_node[0])
-	if total_containers == 100
-		create_new_node
+	if total_containers >= 100
+          create_new_node
+          active_node = all.first
 	end
 
 	puts active_node
