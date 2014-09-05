@@ -9,15 +9,20 @@ module Lxcos
       end
 
       def self.current
-        active_node = all.first
-	total_containers = number_of_containers(active_node[0])
-	if total_containers >= 100
+        nodes_list = all
+        unless nodes_list.empty?
+          active_node = all.last
+          total_containers = number_of_containers(active_node[0])
+          if total_containers >= 100
+            create_new_node
+          end
+        else
           create_new_node
-          active_node = all.first
-	end
+        end
+        
+        active_node = all.last
 
-	puts active_node
-	active_node[0]
+        active_node[0]
       end
 
       # Find number of containers in each node
@@ -65,8 +70,7 @@ module Lxcos
 
 
         #Provision it
-        status = system(provision_cmd) ? 0 : -1
-        exit status
+        system(provision_cmd) ? 0 : -1
       end
 
       def self.create_container(node_name)
