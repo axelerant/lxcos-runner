@@ -9,20 +9,25 @@ module Lxcos
       end
 
       def self.current
-        nodes_list = all
-        unless nodes_list.empty?
-          active_node = all.last
-          total_containers = number_of_containers(active_node[0])
-          if total_containers >= 100
-            create_new_node
-          end
-        else
+        active_node = get_active
+        if active_node.nil?
           create_new_node
+          active_node = get_active
+        else
+          total_containers = number_of_containers(active_node)
+          if total_containers >= 100
+            mark_node_inactive(active_node)
+            create_new_node
+            active_node = get_active
+          end
         end
         
-        active_node = all.last
+        active_node
+      end
 
-        active_node[0]
+      def self.mark_node_inactive(node_name)
+        remove_tag_cmd = "knife tag delete #{node_name} active"
+        system(remove_tag_cmd)
       end
 
       # Find number of containers in each node
@@ -48,7 +53,7 @@ module Lxcos
         username = "ubuntu"
         aws_key_name = "medhuec2" #Key name on the runner machine
         aws_key_path = "/home/ubuntu/medhuec2.pem" #Full path of the key
-        # tag = "active"
+        tag = "active"
 
         #Command to provision the instance
         provision_cmd = [
@@ -65,7 +70,7 @@ module Lxcos
                          "-A #{aws_access_key_id}",
                          "-K #{aws_secret_access_key}",
                          "--ebs-size #{ebs_root_vol_size}"
-                         # "-T active=#{tag}"
+                         "-T active=#{tag}"
                         ].join(" ")
 
 
@@ -102,9 +107,14 @@ module Lxcos
       end
 
       # check if node is active
-      def self.is_active?(node_name)
-        node = Chef::Node.load(node_name)
-        node.tags.include?('active')
+      def self.get_active
+        all.each do |node_name, url|
+          node = Chef::Node.load(node_name)
+          return node_name if node.tags.include?('active')
+        end
+
+        #no active
+        return nil
       end
     end
 
