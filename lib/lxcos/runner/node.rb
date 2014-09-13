@@ -53,7 +53,7 @@ module Lxcos
         username = "ubuntu"
         aws_key_name = "medhuec2" #Key name on the runner machine
         aws_key_path = "/home/ubuntu/medhuec2.pem" #Full path of the key
-        tag = "active"
+        #tag = "active"
 
         #Command to provision the instance
         provision_cmd = [
@@ -70,12 +70,18 @@ module Lxcos
                          "-A #{aws_access_key_id}",
                          "-K #{aws_secret_access_key}",
                          "--ebs-size #{ebs_root_vol_size}"
-                         "-T active=#{tag}"
+                         #"--T Tag=#{tag}"
                         ].join(" ")
 
 
         #Provision it
         system(provision_cmd) ? 0 : -1
+        tag_node_active(node_name)
+      end
+
+      def self.tag_node_active(node_name)
+        tag_command = "knife tag create #{node_name} active"
+        system(tag_command)
       end
 
       def self.create_container(node_name)
