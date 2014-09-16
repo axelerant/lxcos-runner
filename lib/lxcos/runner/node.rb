@@ -1,3 +1,4 @@
+require 'route53'
 
 module Lxcos
   module Runner
@@ -16,7 +17,7 @@ module Lxcos
         else
           total_containers = number_of_containers(active_node)
           if total_containers >= 100
-            mark_node_inactive(active_node)
+            mark_node_inactive(active_node.name)
             create_new_node
             active_node = get_active
           end
@@ -31,17 +32,13 @@ module Lxcos
       end
 
       # Find number of containers in each node
-      def self.number_of_containers(node_name)
-        Net::SSH.start(node_name, 'goatos') do |session|
+      def self.number_of_containers(node)
+        Net::SSH.start(node["ec2"]["public_ipv4"], 'goatos') do |session|
           session.exec!('number_of_containers.rb')
         end
       end
 
       def self.create_new_node
-        # Many of these can go into knife.rb file after some initial tweaking.
-        aws_access_key_id = "your-aws-access-key-id"
-        aws_secret_access_key = "your-aws-secret-access-key"
-
         #Node details
         node_name = name
         instance_size = "t1.micro"  #For initial testing later to a large instance
@@ -53,7 +50,6 @@ module Lxcos
         username = "ubuntu"
         aws_key_name = "medhuec2" #Key name on the runner machine
         aws_key_path = "/home/ubuntu/medhuec2.pem" #Full path of the key
-        #tag = "active"
 
         #Command to provision the instance
         provision_cmd = [
@@ -67,17 +63,27 @@ module Lxcos
                          "-S #{aws_key_name}",
                          "-N #{node_name}",
                          "-i #{aws_key_path}",
-                         "-A #{aws_access_key_id}",
-                         "-K #{aws_secret_access_key}",
                          "--ebs-size #{ebs_root_vol_size}"
-                         #"--T Tag=#{tag}"
                         ].join(" ")
 
 
         #Provision it
         system(provision_cmd) ? 0 : -1
         tag_node_active(node_name)
+	add_route53_dns(node_name)
       end
+
+	def self.add_route53_dns(node_name)
+	  conn = Route53::Connection.new(Chef::Config[:knife][:aws_access_key_id], Chef::Config[:knife][:aws_secret_access_key]) #opens connection
+	  zone = conn.get_zones.first
+	  ip_of_node = Chef::Node.load(node_name)["ec2"]["public_ipv4"]
+	  dns_base = Route53::DNSRecord.new(node_name,"A","300", [ip_of_node], zone)
+	  dns_base.create
+
+	  dns_sub_domain = Route53::DNSRecord.new("*." + node_name,"A","300", [ip_of_node], zone)
+	  dns_sub_domain.create
+	end
+
 
       def self.tag_node_active(node_name)
         tag_command = "knife tag create #{node_name} active"
@@ -116,7 +122,7 @@ module Lxcos
       def self.get_active
         all.each do |node_name, url|
           node = Chef::Node.load(node_name)
-          return node_name if node.tags.include?('active')
+          return node if node.tags.include?('active')
         end
 
         #no active
