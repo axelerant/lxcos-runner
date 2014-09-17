@@ -11,18 +11,22 @@ module Lxcos
 
       def self.current
         active_node = get_active
-        if active_node.nil?
+	if active_node.nil?
+	  p "No active node, creating new"
           create_new_node
           active_node = get_active
         else
           total_containers = number_of_containers(active_node)
+	  p "Total containers: #{total_containers}"
           if total_containers >= 100
+		p "Container limit crossed on #{active_node.name}, creating new node"
             mark_node_inactive(active_node.name)
             create_new_node
             active_node = get_active
           end
         end
         
+	p "Active node: #{active_node.name}"
         active_node
       end
 
