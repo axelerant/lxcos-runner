@@ -37,15 +37,18 @@ module Lxcos
 
       # Find number of containers in each node
       def self.number_of_containers(node)
+	container_hash = ""
         Net::SSH.start(node["ec2"]["public_ipv4"], 'goatos') do |session|
-          session.exec!('number_of_containers.rb')
+          container_hash = session.exec!('number_of_containers.rb')
         end
+
+JSON.parse(container_hash)["number_of_containers"]
       end
 
       def self.create_new_node
         #Node details
         node_name = name
-        instance_size = "t1.micro"  #For initial testing later to a large instance
+        instance_size = "m1.large"  #For initial testing later to a large instance
         ebs_root_vol_size = 30   # in GB
         region = "us-east-1b"
         ami_name = "ami-7050ae18" #Use this prebaked AMI

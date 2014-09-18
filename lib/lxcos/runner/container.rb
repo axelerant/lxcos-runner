@@ -13,13 +13,17 @@ module Lxcos
       def create
         active_node = Node.current
 	node_ip = active_node['ec2']['public_ipv4']
+	container_hash = ""
 	Net::SSH.start(node_ip, 'goatos') do |session|
-	  container_ip = session.exec!("create_container.rb -n #{name} -t #{type} -m #{memory} -c #{cpus}")
+	  container_hash = session.exec!("create_container.rb -n #{name} -t #{type} -m #{memory} -c #{cpus}")
         end
+
+	container_ip = JSON.parse(container_hash)["ip_addr"].first
 
 	return {node_name: active_node.name,
 		node_ip: node_ip,
-		container_ip: container_ip
+		container_ip: container_ip,
+		container_name: name
 		}
       end
  
