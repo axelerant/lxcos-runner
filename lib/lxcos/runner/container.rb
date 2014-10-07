@@ -21,7 +21,7 @@ module Lxcos
 	      container_ip = JSON.parse(container_hash)["ip_addr"].first
 
         # For new container to sit on a public dns, run haproxy cookbook on the active node 
-        Net::SSH.start(active_node, 'ubuntu') do |session|
+        Net::SSH.start(node_ip, 'ubuntu') do |session|
           session.exec!("sudo chef-client -o 'role[haproxy]'")
         end
 
