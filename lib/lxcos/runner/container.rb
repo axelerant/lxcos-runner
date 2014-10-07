@@ -12,19 +12,25 @@ module Lxcos
 
       def create
         active_node = Node.current
-	node_ip = active_node['ec2']['public_ipv4']
-	container_hash = ""
-	Net::SSH.start(node_ip, 'goatos') do |session|
-	  container_hash = session.exec!("create_container.rb -n #{name} -t #{type} -m #{memory} -c #{cpus}")
+	      node_ip = active_node['ec2']['public_ipv4']
+	      container_hash = ""
+	      Net::SSH.start(node_ip, 'goatos') do |session|
+	        container_hash = session.exec!("create_container.rb -n #{name} -t #{type} -m #{memory} -c #{cpus}")
         end
 
-	container_ip = JSON.parse(container_hash)["ip_addr"].first
+	      container_ip = JSON.parse(container_hash)["ip_addr"].first
 
-	return {node_name: active_node.name,
-		node_ip: node_ip,
-		container_ip: container_ip,
-		container_name: name
-		}
+        # For new container to sit on a public dns, run haproxy cookbook on the active node 
+        Net::SSH.start(node_ip, 'ubuntu') do |session|
+          session.exec!("sudo chef-client -o 'role[haproxy]'")
+        end
+
+	      return {
+          node_name: active_node.name,
+      		node_ip: node_ip,
+      		container_ip: container_ip,
+      		container_name: name
+		    }
       end
  
     end
