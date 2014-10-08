@@ -1,5 +1,3 @@
-require 'log4r'
-
 module Lxcos
   module Runner
     class Container
@@ -14,20 +12,17 @@ module Lxcos
 
       def create
         active_node = Node.current
-        @log = Log4r::Logger.new(active_node)
-        @log.level = Log4r::INFO
-        @log.info("%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%")
         
 	node_ip = active_node['ec2']['public_ipv4']
 	container_hash = ""
-	Net::SSH.start("54.198.88.19", 'goatos') do |session|
+	Net::SSH.start(node_ip, 'goatos') do |session|
 	  container_hash = session.exec!("create_container.rb -n #{name} -t #{type} -m #{memory} -c #{cpus}")
         end
 
 	container_ip = JSON.parse(container_hash)["ip_addr"].first
-	# Net::SSH.start(node_ip, 'ubuntu') do |session|
-	#   haproxy_hash = session.exec!("sudo chef-client -o 'role[haproxy]'")
- #        end
+	Net::SSH.start(node_ip, 'ubuntu') do |session|
+	  haproxy_hash = session.exec!("sudo chef-client -o 'role[haproxy]'")
+        end
 
 	return {node_name: active_node.name,
 		node_ip: node_ip,
