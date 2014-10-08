@@ -1,3 +1,5 @@
+require 'log4r'
+
 module Lxcos
   module Runner
     class Container
@@ -12,6 +14,8 @@ module Lxcos
 
       def create
         active_node = Node.current
+        @log = Log4r::Logger.new(active_node)
+        @log.level = Log4r::INFO
         
 	node_ip = active_node['ec2']['public_ipv4']
 	container_hash = ""
@@ -26,7 +30,7 @@ module Lxcos
 
 	return {node_name: active_node.name,
 		node_ip: node_ip,
-		# container_ip: container_ip,
+		container_ip: container_ip,
 		container_name: name
 		}
       end
