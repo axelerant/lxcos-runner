@@ -12,6 +12,10 @@ module Lxcos
 
       def create
         active_node = Node.current
+        puts "*" * 100
+        puts "#{active_node['ec2']['public_ipv4']}" 
+        puts "*" * 100
+        
 	node_ip = active_node['ec2']['public_ipv4']
 	container_hash = ""
 	Net::SSH.start(node_ip, 'goatos') do |session|
