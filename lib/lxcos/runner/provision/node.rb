@@ -42,7 +42,7 @@ module Lxcos
           container_hash = session.exec!('number_of_containers.rb')
         end
 
-JSON.parse(container_hash)["number_of_containers"]
+        JSON.parse(container_hash)["number_of_containers"]
       end
 
       def self.create_new_node
