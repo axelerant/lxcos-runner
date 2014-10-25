@@ -26,4 +26,5 @@ Gem::Specification.new do |spec|
   spec.add_runtime_dependency "lxc"
   spec.add_runtime_dependency "knife-ec2"
   spec.add_runtime_dependency "route53"
+  spec.add_runtime_dependency "capistrano"
 end
