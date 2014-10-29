@@ -1,15 +1,9 @@
+require 'open3'
+
 module Lxcos
   module Runner
     class Deploy
       def initialize(params)
-        params = {project_name: "dodydeghi", 
-          repo_url: "git@github.com:devaroop/SmsTicketBooking.git",
-          server_host: "localhost",
-          server_user: "devaroop",
-          deploy_to_folder: "/tmp/dodydeghi",
-          scm_branch: "master"
-        }
-
         @project_name, @repo_url, 
         @server_host, @server_user, 
         @password, @scm_branch, @deploy_to_folder = params[:project_name], params[:repo_url], 
@@ -18,7 +12,7 @@ module Lxcos
       end
 
       def deploy_code
-        output = run(deploy_code_command)
+        run(deploy_code_command)
       end
 
       private
