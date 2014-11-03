@@ -2,17 +2,18 @@ server ENV['server_host'], user: ENV['server_user'], roles: %w{web app}, passwor
 set :container_host, ENV['container_host']
 set :container_user, ENV['container_user']
 
-role :container, "#{fetch(:container_user)}@#{fetch(:container_host)}"
+module Container
+  def self.execute(cmd)
+    "ssh #{fetch(:container_user)}@#{fetch(:container_host)} \"#{cmd}\""
+  end
+end
 
 namespace :environment do
 
   desc 'Create the Environment on the container'
-  task :create => [] do
+  task :create do
     on roles(:app) do
-      execute 'whoami'
-      on roles(:container) do
-        execute 'hostname'
-      end
+      execute Container.execute('hostname')
     end
   end
 
