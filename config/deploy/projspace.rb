@@ -13,7 +13,7 @@ namespace :environment do
   desc 'Create the Environment on the container'
   task :create do
     on roles(:app) do
-      execute Container.execute('hostname')
+      execute Container.execute("envadd #{fetch(:application)} #{ENV['environment_name']} #{fetch(:repo_url)}")
     end
   end
 

@@ -23,4 +23,5 @@ require "lxcos/runner/provision/node.rb"
 require "lxcos/runner/provision/container.rb"
 
 #deploy
-require "lxcos/runner/deploy/deploy.rb"
+require "lxcos/runner/deploy/task_runner.rb"
+require "lxcos/runner/deploy/environment.rb"
