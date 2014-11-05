@@ -19,7 +19,7 @@ module Lxcos
           total_containers = number_of_containers(active_node)
 	  p "Total containers: #{total_containers}"
           if total_containers >= 100
-		p "Container limit crossed on #{active_node.name}, creating new node"
+            p "Container limit crossed on #{active_node.name}, creating new node"
             mark_node_inactive(active_node.name)
             create_new_node
             active_node = get_active
@@ -80,16 +80,16 @@ module Lxcos
 	add_route53_dns(node_name)
       end
 
-	def self.add_route53_dns(node_name)
-	  conn = Route53::Connection.new(Chef::Config[:knife][:aws_access_key_id], Chef::Config[:knife][:aws_secret_access_key]) #opens connection
-	  zone = conn.get_zones.first
-	  ip_of_node = Chef::Node.load(node_name)["ec2"]["public_ipv4"]
-	  dns_base = Route53::DNSRecord.new(node_name,"A","300", [ip_of_node], zone)
-	  dns_base.create
+      def self.add_route53_dns(node_name)
+        conn = Route53::Connection.new(Chef::Config[:knife][:aws_access_key_id], Chef::Config[:knife][:aws_secret_access_key]) #opens connection
+        zone = conn.get_zones.first
+        ip_of_node = Chef::Node.load(node_name)["ec2"]["public_ipv4"]
+        dns_base = Route53::DNSRecord.new(node_name,"A","300", [ip_of_node], zone)
+        dns_base.create
 
-	  dns_sub_domain = Route53::DNSRecord.new("*." + node_name,"A","300", [ip_of_node], zone)
-	  dns_sub_domain.create
-	end
+        dns_sub_domain = Route53::DNSRecord.new("*." + node_name,"A","300", [ip_of_node], zone)
+        dns_sub_domain.create
+      end
 
 
       def self.tag_node_active(node_name)
