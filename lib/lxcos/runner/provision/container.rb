@@ -21,7 +21,7 @@ module Lxcos
 
 	container_ip = JSON.parse(container_hash)["ip_addr"].first
 	Net::SSH.start(node_ip, 'ubuntu') do |session|
-	  haproxy_hash = session.exec!("sudo chef-client -o 'role[haproxy]'")
+	  session.exec!("sudo chef-client -o 'role[haproxy]'")
         end
 
 	return {node_name: active_node.name,
@@ -29,6 +29,9 @@ module Lxcos
 		container_ip: container_ip,
 		container_name: name
 		}
+      rescue => e
+        puts e
+        return {}
       end
  
     end
