@@ -24,14 +24,14 @@ module Lxcos
 	  session.exec!("sudo chef-client -o 'role[haproxy]'")
         end
 
-	return {node_name: active_node.name,
-		node_ip: node_ip,
-		container_ip: container_ip,
-		container_name: name
-		}
+        {node_name: active_node.name,
+          node_ip: node_ip,
+          container_ip: container_ip,
+          container_name: name
+        }
       rescue => e
         puts e
-        return {}
+        {}
       end
  
     end

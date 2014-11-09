@@ -22,6 +22,10 @@ module Lxcos
         full_cmd = "#{cmd} #{defaults.join(' ')}"
         puts "Executing: #{full_cmd}"
         system(full_cmd)
+
+      rescue => e
+        puts e
+        {}
       end
       
     end
