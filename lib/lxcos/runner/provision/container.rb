@@ -26,10 +26,7 @@ module Lxcos
 	  session.exec!("sudo chef-client -o 'role[haproxy]'")
 
           #passwordless ssh
-          session.exec!("sudo mkdir -p /opt/goatos/.local/share/lxc/#{name}/delta0/home/ubuntu/.ssh")
-          session.exec!("sudo cp /opt/goatos/.ssh/id_rsa.pub /opt/goatos/.local/share/lxc/#{name}/delta0/home/ubuntu/.ssh/authorized_keys")
-          session.exec!("sudo chown 165536.165536 /opt/goatos/.local/share/lxc/#{name}/delta0/home");
-
+          session.exec!("sudo add_key_to_container #{name}")
         end
 
         {node_name: active_node.name,
