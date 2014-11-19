@@ -4,7 +4,7 @@ set :container_user, ENV['container_user']
 
 module Container
   def self.execute(cmd)
-    "ssh #{fetch(:container_user)}@#{fetch(:container_host)} \"#{cmd}\""
+    "ssh -o StrictHostKeyChecking=no #{fetch(:container_user)}@#{fetch(:container_host)} \"#{cmd}\""
   end
 end
 
