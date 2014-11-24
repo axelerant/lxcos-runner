@@ -19,13 +19,21 @@ module Lxcos
         output = run(cmd)
 
         #format dbname||dbuser||dbpass||site" 
-        credset = output.split.last.split("||")
+        #credset = output.split.last.split("||")
         
-        {environment_name: @name,
-          db_name: output[0],
-          db_user: output[1],
-          db_password: output[2],
-          site_http_url: output[3]
+
+        # {environment_name: @name,
+        #   db_name: output[0],
+        #   db_user: output[1],
+        #   db_password: output[2],
+        #   site_http_url: output[3]
+        # }
+
+        #hardcode output, cannot parse now
+        {db_name: "#{@project_name}#{@name}",
+          db_user: "#{@project_name}#{@name}",
+          db_password: "#{@project_name}#{@name}",
+          site_http_url: "http://#{@project_name}.#{@name}.projspace.com"
         }
       end
 
