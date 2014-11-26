@@ -20,7 +20,7 @@ namespace :environment do
   desc 'Deploy code for the environment'
   task :deploy_code do
     on roles(:app) do
-      execute Container.execute("sudo rm /home/#{fetch(:project_name)}/www/#{fetch(:environment_name)}/{*,.??*} -rf && sudo -u www-data git clone #{fetch(:repo_url)} /home/#{fetch(:project_name)}/www/#{fetch(:environment_name)}/ && cd /home/#{fetch(:project_name)}/www/#{fetch(:environment_name)}/ && sudo -u www-data git config core.sharedRepository true && cd /home/#{fetch(:project_name)}/www/#{fetch(:environment_name)}/ && sudo -u www-data git checkout #{fetch(:repo_branch)} && sudo -u www-data ln -s /home/#{fetch(:project_name)}/files/#{fetch(:environment_name)} /home/#{fetch(:project_name)}/www/#{fetch(:environment_name)}/docroot/#{fetch(:files_path)} && sudo -u www-data sh /home/#{fetch(:project_name)}/www/#{fetch(:environment_name)}/projspace-utils/#{fetch(:environment_name)}-postDeployHook")
+      execute Container.execute("sudo rm /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/{*,.??*} -rf && sudo -u www-data git clone #{fetch(:repo_url)} /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/ && cd /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/ && sudo -u www-data git config core.sharedRepository true && cd /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/ && sudo -u www-data git checkout #{ENV['repo_branch']} && sudo -u www-data ln -s /home/#{ENV['project_name']}/files/#{ENV['environment_name']} /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/docroot/#{ENV['files_path']} && sudo -u www-data sh /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/projspace-utils/#{ENV['environment_name']}-postDeployHook")
     end
   end
 
