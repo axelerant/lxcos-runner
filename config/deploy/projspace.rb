@@ -24,5 +24,19 @@ namespace :environment do
     end
   end
 
+  desc 'Sync DB for the environment'
+  task :sync_database do
+    on roles(:app) do
+
+    end
+  end
+
+  desc 'Sync DB for the environment'
+  task :sync_files do
+    on roles(:app) do
+
+    end
+  end
+
 
 end
