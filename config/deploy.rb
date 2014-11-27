@@ -3,7 +3,7 @@ lock '3.2.1'
 
 set :application, ENV['project_name']
 set :repo_url, ENV['repo_url']
-
+set :pty, true
 # Default branch is :master
 # ask :branch, proc { `git rev-parse --abbrev-ref HEAD`.chomp }.call
 
