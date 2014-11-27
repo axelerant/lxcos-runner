@@ -11,6 +11,7 @@ module Lxcos
         params.fetch(:destination_db_password), params.fetch(:destination_db_name)
 
         @project_name = params.fetch(:project_name)
+        @executing_user = params.fetch(:executing_user, 'ubuntu')
       end
       
       def sync
@@ -21,7 +22,8 @@ module Lxcos
                       "source_db_user=#{@source_db_user}",
                       "destination_db_password=#{@destination_db_password}",
                       "destination_db_name=#{@destination_db_name}",
-                      "destination_db_user=#{@destination_db_user}"
+                      "destination_db_user=#{@destination_db_user}",
+                      "executing_user=#{@executing_user}"
                      ]
 
         cmd = "cap projspace environment:sync_database #{cmd_params.join(' ')}"
