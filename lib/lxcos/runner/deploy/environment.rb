@@ -37,6 +37,15 @@ module Lxcos
         }
       end
 
+      def lock
+        cmd_params = [
+                      "project_name=#{@project_name}",
+                      "environment_name=#{@name}"
+                     ]
+        cmd = "cap projspace environment:lock_site #{cmd_params.join(' ')}" 
+        run(cmd)            
+      end
+
     end
   end
 end
