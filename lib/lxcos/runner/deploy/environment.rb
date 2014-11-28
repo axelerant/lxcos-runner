@@ -43,7 +43,7 @@ module Lxcos
                       "environment_name=#{@name}"
                      ]
         cmd = "cap projspace environment:lock_site #{cmd_params.join(' ')}" 
-        run(cmd)            
+        run(cmd)
       end
 
     end

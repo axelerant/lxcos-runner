@@ -38,5 +38,11 @@ namespace :environment do
     end
   end
 
+  desc 'Lock site for the environment'
+  task :lock_site do
+    on roles(:app) do
+      execute Container.execute("sudo a2dissite #{ENV['project_name']}.#{ENV['environment_name']}.projspace.com.conf && sudo a2ensite locked.#{ENV['project_name']}.#{ENV['environment_name']}.projspace.com.conf && sudo /etc/init.d/apache2 reload")
+    end  
+  end 
 
 end
