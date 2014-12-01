@@ -18,7 +18,7 @@ module Lxcos
         cmd = "cap projspace environment:create #{cmd_params.join(' ')}"
         output = run(cmd)
 
-        #format dbname||dbuser||dbpass||site" 
+        #format dbname||dbuser||dbpass||site||site_security||http_lock_uname||http_lock_pwd" 
         #credset = output.split.last.split("||")
         
 
@@ -30,10 +30,13 @@ module Lxcos
         # }
 
         #hardcode output, cannot parse now
-        {db_name: "#{@project_name}#{@name}",
+        { db_name: "#{@project_name}#{@name}",
           db_user: "#{@project_name}#{@name}",
           db_password: "#{@project_name}#{@name}",
-          site_http_url: "http://#{@project_name}.#{@name}.projspace.com"
+          site_http_url: "http://#{@project_name}.#{@name}.projspace.com",
+          site_security: true,
+          http_lock_uname: "#{@project_name}",
+          http_lock_pwd: "#{@project_name}"
         }
       end
 
