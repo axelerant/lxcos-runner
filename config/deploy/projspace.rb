@@ -27,7 +27,7 @@ namespace :environment do
   desc 'Sync DB for the environment'
   task :sync_database do
     on roles(:app) do
-
+      execute Container.execute("mysqldump -u #{ENV['source_db_user']} -p#{ENV['source_db_password']} #{ENV['source_db_name']} |  tee /home/#{ENV['project_name']}/dbdumps/#{ENV['source_db_name']}to#{ENV['destination_db_name']}.sql > /dev/null && mysql -u #{ENV['destination_db_user']} -p#{ENV['destination_db_password']} #{ENV['destination_db_name']} < /home/#{ENV['project_name']}/dbdumps/#{ENV['source_db_name']}to#{ENV['destination_db_name']}.sql")
     end
   end
 
