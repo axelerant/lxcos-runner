@@ -34,7 +34,7 @@ namespace :environment do
   desc 'Sync DB for the environment'
   task :sync_files do
     on roles(:app) do
-
+      execute Container.execute("rsync -auz /home/#{ENV['project_name']}/files/#{ENV['source_env_name']}/* /home/${project}/files/#{ENV['destination_env_name']}/")
     end
   end
 
