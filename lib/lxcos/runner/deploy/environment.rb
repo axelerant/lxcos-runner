@@ -13,7 +13,7 @@ module Lxcos
         cmd_params = [
                       "project_name=#{@project_name}",
                       "environment_name=#{@name}",
-                      "node_name=#{@node_name}"
+                      "node_name=#{node_name}"
                       ]
 
         cmd = "cap projspace environment:create #{cmd_params.join(' ')}"
