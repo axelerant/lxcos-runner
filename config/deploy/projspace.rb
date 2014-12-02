@@ -13,8 +13,18 @@ namespace :environment do
   desc 'Create the Environment on the container'
   task :create do
     on roles(:app) do
-      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']} #{fetch(:repo_url)}")
+      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']}}")
+
+      execute "proxy_direct -c #{fetch(:application)} -e #{ENV['environment_name']} -i #{ENV['container_host']} -n #{ENV['node_name']}"
     end
+
+    #this is lame
+    Net::SSH.start(ENV['server_host'], 'ubuntu') do |session|
+      session.exec!("sudo cp /opt/goatos/.local/share/lxc/#{fetch(:application)}/#{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io /etc/apache2/sites-available/")
+
+      session.exec!("sudo a2ensite #{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf && sudo /etc/init.d/apache2 reload")
+    end
+
   end
 
   desc 'Deploy code for the environment'

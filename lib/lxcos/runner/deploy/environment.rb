@@ -4,15 +4,16 @@ module Lxcos
 
       def initialize(params)
         super(params)
-        @repo_url, @name, @project_name = params.fetch(:scm_url), params.fetch(:environment_name),
+        @server_name, @name, @project_name = params.fetch(:server_name), params.fetch(:environment_name),
         params.fetch(:project_name)
       end
 
       def create
+        node_name = @server_name.split('.')[0]
         cmd_params = [
                       "project_name=#{@project_name}",
-                      "repo_url=#{@repo_url}",
-                      "environment_name=#{@name}"
+                      "environment_name=#{@name}",
+                      "node_name=#{@node_name}"
                       ]
 
         cmd = "cap projspace environment:create #{cmd_params.join(' ')}"
