@@ -31,7 +31,7 @@ module Lxcos
 
         container_key = ""
         Net::SSH.start(node_ip, 'goatos') do |session|
-          container_key = session.exec!("ssh -A -t -o StrictHostKeyChecking=no ubuntu@#{container_ip} 'sudo gen_keys ubuntu'")
+          container_key = session.exec!("ssh -o LogLevel=quiet -A -t -t -o StrictHostKeyChecking=no ubuntu@#{container_ip} 'sudo gen_keys ubuntu'")
         end
 
         {node_name: active_node.name,
