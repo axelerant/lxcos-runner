@@ -20,7 +20,7 @@ namespace :environment do
 
     #this is lame
     Net::SSH.start(ENV['server_host'], 'ubuntu') do |session|
-      session.exec!("sudo cp /opt/goatos/.local/share/lxc/#{fetch(:application)}/#{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io /etc/apache2/sites-available/")
+      session.exec!("sudo cp /opt/goatos/.local/share/lxc/#{fetch(:application)}/#{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf /etc/apache2/sites-available/")
 
       session.exec!("sudo a2ensite #{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf && sudo /etc/init.d/apache2 reload")
     end

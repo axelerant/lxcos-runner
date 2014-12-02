@@ -34,7 +34,7 @@ module Lxcos
         {db_name: "#{@project_name}#{@name}",
           db_user: "#{@project_name}#{@name}",
           db_password: "#{@project_name}#{@name}",
-          site_http_url: "http://#{@project_name}.#{@name}.projspace.com"
+          site_http_url: "http://#{@project_name}.#{@name}.#{node_name}.lxcos.io"
         }
       end
 
