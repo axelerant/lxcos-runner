@@ -29,10 +29,16 @@ module Lxcos
           session.exec!("sudo add_key_to_container #{name}")
         end
 
+        container_key = ""
+        Net::SSH.start(node_ip, 'goatos') do |session|
+          container_key = session.exec!("ssh -o LogLevel=quiet -A -t -t -o StrictHostKeyChecking=no ubuntu@#{container_ip} 'sudo gen_keys ubuntu'")
+        end
+
         {node_name: active_node.name,
           node_ip: node_ip,
           container_ip: container_ip,
-          container_name: name
+          container_name: name,
+          container_key: container_key
         }
       rescue => e
         puts e
