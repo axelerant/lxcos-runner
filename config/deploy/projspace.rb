@@ -13,8 +13,18 @@ namespace :environment do
   desc 'Create the Environment on the container'
   task :create do
     on roles(:app) do
-      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']} #{fetch(:repo_url)}")
+      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']}}")
+
+      execute "proxy_direct -c #{fetch(:application)} -e #{ENV['environment_name']} -i #{ENV['container_host']} -n #{ENV['node_name']}"
     end
+
+    #this is lame
+    Net::SSH.start(ENV['server_host'], 'ubuntu') do |session|
+      session.exec!("sudo cp /opt/goatos/.local/share/lxc/#{fetch(:application)}/#{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf /etc/apache2/sites-available/")
+
+      session.exec!("sudo a2ensite #{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf && sudo /etc/init.d/apache2 reload")
+    end
+
   end
 
   desc 'Deploy code for the environment'
@@ -27,14 +37,14 @@ namespace :environment do
   desc 'Sync DB for the environment'
   task :sync_database do
     on roles(:app) do
-
+      execute Container.execute("mysqldump -u #{ENV['source_db_user']} -p#{ENV['source_db_password']} #{ENV['source_db_name']} |  tee /home/#{ENV['project_name']}/dbdumps/#{ENV['source_db_name']}to#{ENV['destination_db_name']}.sql > /dev/null && mysql -u #{ENV['destination_db_user']} -p#{ENV['destination_db_password']} #{ENV['destination_db_name']} < /home/#{ENV['project_name']}/dbdumps/#{ENV['source_db_name']}to#{ENV['destination_db_name']}.sql")
     end
   end
 
   desc 'Sync DB for the environment'
   task :sync_files do
     on roles(:app) do
-
+      execute Container.execute("rsync -auz /home/#{ENV['project_name']}/files/#{ENV['source_env_name']}/* /home/${project}/files/#{ENV['destination_env_name']}/")
     end
   end
 
