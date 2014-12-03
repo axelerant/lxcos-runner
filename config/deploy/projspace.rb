@@ -13,7 +13,7 @@ namespace :environment do
   desc 'Create the Environment on the container'
   task :create do
     on roles(:app) do
-      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']}}")
+      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']}")
 
       execute "proxy_direct -c #{fetch(:application)} -e #{ENV['environment_name']} -i #{ENV['container_host']} -n #{ENV['node_name']}"
     end
