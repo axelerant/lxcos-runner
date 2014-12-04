@@ -30,7 +30,7 @@ namespace :environment do
   desc 'Deploy code for the environment'
   task :deploy_code do
     on roles(:app) do
-      execute Container.execute("git clone #{ENV['repo_url'] /home/#{ENV['project_name']}/www/#{ENV['environment_name']} -b #{ENV['repo_branch']}")
+      execute Container.execute("git clone #{ENV['repo_url']} /home/#{ENV['project_name']}/www/#{ENV['environment_name']} -b #{ENV['repo_branch']}")
     end
   end
 
