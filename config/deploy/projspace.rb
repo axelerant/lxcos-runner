@@ -30,7 +30,7 @@ namespace :environment do
   desc 'Deploy code for the environment'
   task :deploy_code do
     on roles(:app) do
-      execute Container.execute("sudo rm /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/{*,.??*} -rf && sudo -u www-data git clone #{fetch(:repo_url)} /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/ && cd /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/ && sudo -u www-data git config core.sharedRepository true && cd /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/ && sudo -u www-data git checkout #{ENV['repo_branch']} && sudo -u www-data ln -s /home/#{ENV['project_name']}/files/#{ENV['environment_name']} /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/docroot/#{ENV['files_path']} && sudo -u www-data sh /home/#{ENV['project_name']}/www/#{ENV['environment_name']}/projspace-utils/#{ENV['environment_name']}-postDeployHook")
+      execute Container.execute("git clone #{ENV['repo_url'] /home/#{ENV['project_name']}/www/#{ENV['environment_name']} -b #{ENV['repo_branch']}")
     end
   end
 
