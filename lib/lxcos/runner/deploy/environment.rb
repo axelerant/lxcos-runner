@@ -9,7 +9,7 @@ module Lxcos
 
         if params.has_key? :http_lock
           @http_lock_uname, @http_lock_pwd = params[:http_lock].fetch(:http_lock_uname), 
-                                             params[:http_lock].fetch(:http_lock_pwd), 
+                                             params[:http_lock].fetch(:http_lock_pwd) 
         end 
       end
 
@@ -50,8 +50,8 @@ module Lxcos
         cmd_params = [
                       "project_name=#{@project_name}",
                       "environment_name=#{@name}",
-                      "http_lock_uname=#{http_lock_uname}",
-                      "http_lock_pwd=#{http_lock_pwd}"
+                      "http_lock_uname=#{@http_lock_uname}",
+                      "http_lock_pwd=#{@http_lock_pwd}"
 
                      ]
         cmd = "cap projspace environment:lock_site #{cmd_params.join(' ')}"   
