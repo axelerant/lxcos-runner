@@ -51,6 +51,8 @@ namespace :environment do
   desc 'Lock site for the environment'
   task :lock_site do
     on roles(:app) do
+      execute Container.execute("htpasswd -dbc /home/#{ENV['project_name']}/.htpasswd#{ENV['environment_name']} #{ENV['http_lock_uname']} #{ENV['http_lock_pwd']}")
+
       execute Container.execute("sudo a2dissite #{ENV['project_name']}.#{ENV['environment_name']}.projspace.com.conf && sudo a2ensite locked.#{ENV['project_name']}.#{ENV['environment_name']}.projspace.com.conf && sudo /etc/init.d/apache2 reload")
     end  
   end 
