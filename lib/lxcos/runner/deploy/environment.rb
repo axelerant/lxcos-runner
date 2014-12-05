@@ -4,8 +4,13 @@ module Lxcos
 
       def initialize(params)
         super(params)
-        @server_name, @name, @project_name = params.fetch(:server_name), params.fetch(:environment_name),
+        @server_name, @name, @project_name = params.fetch(:server_name), params.fetch(:environment_name), 
         params.fetch(:project_name)
+
+        if params.has_key? :http_lock
+          @http_lock_uname, @http_lock_pwd = params[:http_lock].fetch(:http_lock_uname), 
+                                             params[:http_lock].fetch(:http_lock_pwd), 
+        end 
       end
 
       def create
@@ -44,7 +49,10 @@ module Lxcos
       def lock
         cmd_params = [
                       "project_name=#{@project_name}",
-                      "environment_name=#{@name}"
+                      "environment_name=#{@name}",
+                      "http_lock_uname=#{http_lock_uname}",
+                      "http_lock_pwd=#{http_lock_pwd}"
+
                      ]
         cmd = "cap projspace environment:lock_site #{cmd_params.join(' ')}"   
         run(cmd)
