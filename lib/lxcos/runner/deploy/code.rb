@@ -5,7 +5,7 @@ module Lxcos
       def initialize(params)
         super(params)
         @repo_url, @environment_name, @project_name,
-        @repo_branch = params.fetch(:repo_url), params.fetch(:environment_name), params.fetch(:project_name), params.fetch(:branch, "master")
+        @repo_branch = params.fetch(:repo_url), params.fetch(:environment_name), params.fetch(:project_name), params.fetch(:repo_branch, "master")
       end
         
       def deploy
