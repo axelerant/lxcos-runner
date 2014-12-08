@@ -60,6 +60,7 @@ module Lxcos
 
         #Command to provision the instance
         provision_cmd = [
+			 "ec2_hostname",
                          "knife ec2 server create",
                          "-r #{run_list}",
                          "-I #{ami_name}",
