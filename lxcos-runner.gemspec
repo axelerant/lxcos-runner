@@ -21,7 +21,7 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.6"
   spec.add_development_dependency "rake"
   spec.add_development_dependency "log4r"
-  spec.add_runtime_dependency "chef"
+  spec.add_runtime_dependency "chef", "~> 11.6.2"
   spec.add_runtime_dependency "net-ssh"
   spec.add_runtime_dependency "lxc"
   spec.add_runtime_dependency "knife-ec2"
