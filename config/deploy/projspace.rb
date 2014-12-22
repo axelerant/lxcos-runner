@@ -1,10 +1,8 @@
 server ENV['server_host'], user: ENV['server_user'], roles: %w{web app}, password: ENV['password']
-set :container_host, ENV['container_host']
-set :container_user, ENV['container_user']
 
 module Container
   def self.execute(cmd)
-    "ssh -o StrictHostKeyChecking=no -t -A #{fetch(:container_user)}@#{fetch(:container_host)} \"#{cmd}\""
+    "ssh -o StrictHostKeyChecking=no -t -A #{ENV['container_user']}@#{ENV['container_host']} \"#{cmd}\""
   end
 end
 
@@ -13,16 +11,16 @@ namespace :environment do
   desc 'Create the Environment on the container'
   task :create do
     on roles(:app) do
-      execute Container.execute("sudo envadd #{fetch(:application)} #{ENV['environment_name']}")
+      execute Container.execute("sudo envadd #{ENV['project_name']} #{ENV['environment_name']}")
 
-      execute "proxy_direct -c #{fetch(:application)} -e #{ENV['environment_name']} -i #{ENV['container_host']} -n #{ENV['node_name']}"
+      execute "proxy_direct -c #{ENV['project_name']} -e #{ENV['environment_name']} -i #{ENV['container_host']} -n #{ENV['node_name']}"
     end
 
     #this is lame
     Net::SSH.start(ENV['server_host'], 'ubuntu') do |session|
-      session.exec!("sudo cp /opt/goatos/.local/share/lxc/#{fetch(:application)}/#{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf /etc/apache2/sites-available/")
+      session.exec!("sudo cp /opt/goatos/.local/share/lxc/#{ENV['project_name']}/#{ENV['project_name']}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf /etc/apache2/sites-available/")
 
-      session.exec!("sudo a2ensite #{fetch(:application)}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf && sudo /etc/init.d/apache2 reload")
+      session.exec!("sudo a2ensite #{ENV['project_name']}.#{ENV['environment_name']}.#{ENV['node_name']}.lxcos.io.conf && sudo /etc/init.d/apache2 reload")
     end
 
   end
