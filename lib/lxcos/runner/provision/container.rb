@@ -22,7 +22,7 @@ module Lxcos
 	container_ip = JSON.parse(container_hash)["ip_addr"].first
 
         Net::SSH.start(node_ip, 'ubuntu') do |session|
-          session.exec!("hooks_host.rb -n #{active_node.name} -i #{node_ip} -p #{name}")
+          session.exec!("sudo hooks_host.rb -n #{active_node.name} -i #{node_ip} -p #{name}")
           session.exec!("sudo a2ensite #{name}.hooks.#{active_node}.conf && sudo /etc/init.d/apache2 reload")
         end
 
