@@ -4,7 +4,7 @@ module Lxcos
   module Runner
     module Node
 
-      CREATE_NODE_CONTAINER_COUNT = 95
+      CREATE_NODE_CONTAINER_COUNT = 90
       MAX_CONTAINERS_IN_NODE = 100
 
       def self.current
