@@ -39,6 +39,9 @@ module Lxcos
           container_key_ubuntu, container_key_www_data = keys.strip.split("\r\n")
         end
 
+
+        p "Finished creating container, returning"
+
         {node_name: active_node.name,
           node_ip: node_ip,
           container_ip: container_ip,

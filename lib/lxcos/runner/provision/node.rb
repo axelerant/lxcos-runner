@@ -39,7 +39,8 @@ module Lxcos
       end
 
       def self.create_new_node
-        #Node details
+        p "Start creating new node offline"
+
         node_name = get_new_name
         instance_size = "m1.large"  #For initial testing later to a large instance
         ebs_root_vol_size = 30   # in GB
@@ -72,6 +73,7 @@ module Lxcos
         system(provision_cmd) ? 0 : -1
         tag_node(node_name, "ready")
 	add_route53_dns(node_name)
+        p "Finished creating new node #{node_name}"
       end
 
       def self.add_route53_dns(node_name)
