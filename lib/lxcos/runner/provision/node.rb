@@ -12,7 +12,7 @@ module Lxcos
 	if active_node.nil?
 	  p "No active node, creating new"
           create_new_node
-          active_node = get_ready_node
+          active_node = commission_and_get_ready_node
         else
           total_containers = number_of_containers(active_node)
 	  p "Total containers: #{total_containers}"
@@ -24,7 +24,7 @@ module Lxcos
           elsif total_containers >= MAX_CONTAINERS_IN_NODE
             mark_node_inactive(active_node.name)
 
-            active_node = get_ready_node
+            active_node = commission_and_get_ready_node
           end
         end
         
@@ -122,7 +122,7 @@ module Lxcos
         get_node_with_tag("active")
       end
 
-      def self.get_ready_node
+      def self.commission_and_get_ready_node
         node = get_node_with_tag("ready")
         remove_node_tag(node.name, "ready")
         tag_node(node.name, "active")
