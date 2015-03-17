@@ -24,14 +24,13 @@ module Lxcos
         Net::SSH.start(node_ip, 'ubuntu') do |session|
           session.exec!("sudo hooks_host -n #{active_node.name} -i #{container_ip} -p #{name}")
           session.exec!("sudo a2ensite #{name}.hooks.#{active_node.name}.conf && sudo /etc/init.d/apache2 reload")
-        end
 
-	Net::SSH.start(node_ip, 'ubuntu') do |session|
           #haproxy cookbook
 	  session.exec!("sudo chef-client -o 'role[haproxy]'")
 
           #passwordless ssh
           session.exec!("sudo add_key_to_container #{name}")
+
         end
 
         container_key_ubuntu = "", container_key_www_data = ""

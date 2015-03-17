@@ -4,25 +4,27 @@ module Lxcos
   module Runner
     module Node
 
-      #List out all the nodes
-      def self.all
-        Chef::Node.list
-      end
+      CREATE_NODE_CONTAINER_COUNT = 95
+      MAX_CONTAINERS_IN_NODE = 100
 
       def self.current
-        active_node = get_active
+        active_node = get_active_node
 	if active_node.nil?
 	  p "No active node, creating new"
           create_new_node
-          active_node = get_active
+          active_node = get_ready_node
         else
           total_containers = number_of_containers(active_node)
 	  p "Total containers: #{total_containers}"
-          if total_containers >= 100
-            p "Container limit crossed on #{active_node.name}, creating new node"
+          if total_containers == CREATE_NODE_CONTAINER_COUNT
+            p "#{active_node} has #{CREATE_NODE_CONTAINER_COUNT} containers, creating new node"
+            fork do
+              create_new_node
+            end
+          elsif total_containers >= MAX_CONTAINERS_IN_NODE
             mark_node_inactive(active_node.name)
-            create_new_node
-            active_node = get_active
+
+            active_node = get_ready_node
           end
         end
         
@@ -30,24 +32,15 @@ module Lxcos
         active_node
       end
 
-      def self.mark_node_inactive(node_name)
-        remove_tag_cmd = "knife tag delete #{node_name} active"
-        system(remove_tag_cmd)
-      end
 
-      # Find number of containers in each node
-      def self.number_of_containers(node)
-	container_hash = ""
-        Net::SSH.start(node["ec2"]["public_ipv4"], 'goatos') do |session|
-          container_hash = session.exec!('number_of_containers.rb')
-        end
-
-        JSON.parse(container_hash)["number_of_containers"]
+      #List out all the nodes
+      def self.all
+        Chef::Node.list
       end
 
       def self.create_new_node
         #Node details
-        node_name = name
+        node_name = get_new_name
         instance_size = "m1.large"  #For initial testing later to a large instance
         ebs_root_vol_size = 30   # in GB
         region = "us-east-1b"
@@ -77,7 +70,7 @@ module Lxcos
 
         #Provision it
         system(provision_cmd) ? 0 : -1
-        tag_node_active(node_name)
+        tag_node(node_name, "ready")
 	add_route53_dns(node_name)
       end
 
@@ -92,24 +85,21 @@ module Lxcos
         dns_sub_domain.create
       end
 
-
-      def self.tag_node_active(node_name)
-        tag_command = "knife tag create #{node_name} active"
-        system(tag_command)
+      def self.mark_node_inactive(node_name)
+        remove_node_tag(node_name, "active")
       end
 
-      def self.create_container(node_name)
-        #create a container in a node
-        #should return details of the container
-        if self.is_active?(node_name)
-          Net::SSH.start(node_name, 'goatos') do |session|
-            session.exec!('container.rb')
-          end
+      def self.number_of_containers(node)
+	container_hash = ""
+        Net::SSH.start(node["ec2"]["public_ipv4"], 'goatos') do |session|
+          container_hash = session.exec!('number_of_containers.rb')
         end
+
+        JSON.parse(container_hash)["number_of_containers"]
       end
 
       # fetch random word and write remaining words back to the dictionary except for the random one.
-      def self.name
+      def self.get_new_name
         words = File.open("/home/ubuntu/test-runner/runner/dictionary.rb", "r").to_a
         random_word = words.sample
         words_remaining = words - [random_word]
@@ -126,16 +116,39 @@ module Lxcos
         end
       end
 
+      def self.get_active_node
+        get_node_with_tag("active")
+      end
+
+      def self.get_ready_node
+        node = get_node_with_tag("ready")
+        remove_node_tag(node.name, "ready")
+        tag_node(node.name, "active")
+        
+        node
+      end
+
+      def self.tag_node(node_name, tag)
+        tag_command = "knife tag create #{node_name} #{tag}"
+        system(tag_command)
+      end
+
       # check if node is active
-      def self.get_active
+      def self.get_node_with_tag(tag)
         all.each do |node_name, url|
           node = Chef::Node.load(node_name)
-          return node if node.tags.include?('active')
+          return node if node.tags.include?(tag)
         end
 
         #no active
         return nil
       end
+
+      def self.remove_node_tag(node_name, tag)
+        remove_tag_cmd = "knife tag delete #{node_name} #{tag}"
+        system(remove_tag_cmd)
+      end
+
     end
 
   end
