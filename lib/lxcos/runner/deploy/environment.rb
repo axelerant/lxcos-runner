@@ -5,7 +5,7 @@ module Lxcos
       def initialize(params)
         super(params)
         @server_name, @name, @project_name, @server_host, @server_user, @container_user, @container_host = params.fetch(:server_name),
-            params.fetch(:environment_name), params.fetch(:project_name), params.fetch(:server_host), params(:server_user),
+            params.fetch(:environment_name), params.fetch(:project_name), params.fetch(:server_host), params.fetch(:server_user),
             params.fetch(:container_user), params.fetch(:container_host)
 
 
