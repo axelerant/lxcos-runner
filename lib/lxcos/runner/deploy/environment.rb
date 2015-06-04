@@ -4,8 +4,10 @@ module Lxcos
 
       def initialize(params)
         super(params)
-        @server_name, @name, @project_name = params.fetch(:server_name), params.fetch(:environment_name), 
-        params.fetch(:project_name)
+        @server_name, @name, @project_name, @server_host, @server_user, @container_user, @container_host = params.fetch(:server_name),
+            params.fetch(:environment_name), params.fetch(:project_name), params.fetch(:server_host), params(:server_user),
+            params.fetch(:container_user), params(:@container_host)
+
 
         if params.has_key? :http_lock
           @http_lock_uname, @http_lock_pwd = params[:http_lock].fetch(:http_lock_uname), 
@@ -35,10 +37,16 @@ module Lxcos
         #   site_http_url: output[3]
         # }
 
+        db_credential = ""
+        Net::SSH.start(@server_host, @server_user) do |session|
+          credential = session.exec!("ssh -o LogLevel=quiet -A -t -t -o StrictHostKeyChecking=no #{@container_user}@#{@container_host} 'credential #{@project_name} #{@name}'")
+          db_credential = credentials.split("|")[2]
+        end
+
         #hardcode output, cannot parse now
         { db_name: "#{@project_name}#{@name}",
           db_user: "#{@project_name}#{@name}",
-          db_password: "#{@project_name}#{@name}",
+          db_password: db_credential,
           site_http_url: "http://#{@project_name}.#{@name}.#{node_name}.lxcos.io",
           site_security: true,
           http_lock_uname: "#{@project_name}",
