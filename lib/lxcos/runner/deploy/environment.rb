@@ -43,7 +43,7 @@ module Lxcos
         db_credential = ''
         Net::SSH.start(@server_host, @server_user) do |session|
           credential = session.exec!("ssh -o LogLevel=quiet -A -t -t -o StrictHostKeyChecking=no #{@container_user}@#{@container_host} 'credential #{@project_name} #{@name}'")
-          db_credential = credential.split('|')[2]
+          db_credential = credential.strip.split('|')[2]
         end
 
         #hardcode output, cannot parse now
