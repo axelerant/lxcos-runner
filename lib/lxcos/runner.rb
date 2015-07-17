@@ -6,11 +6,11 @@ module Lxcos
     require 'chef'
     require 'chef/knife'
     require 'net/ssh'
-    @config = {}
 
     def self.chef_config_file(file_name)
       Chef::Config.from_file(File.expand_path(file_name))
     end
+
   end
 end
 
