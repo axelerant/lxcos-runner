@@ -40,29 +40,22 @@ module Lxcos
 
       def self.create_new_node
         p "Start creating new node offline"
-
+        knife_custom_config = Chef::Config[:knife]
+        
         node_name = get_new_name
-        instance_size = "m1.large"  #For initial testing later to a large instance
-        ebs_root_vol_size = 30   # in GB
-        region = "us-east-1b"
-        ami_name = "ami-7050ae18" #Use this prebaked AMI
-        security_group = "goatbase"
-        run_list = "role[lxcosbase]"
-        username = "ubuntu"
-        aws_key_name = "medhuec2" #Key name on the runner machine
-        aws_key_path = "/home/ubuntu/medhuec2.pem" #Full path of the key
+        ebs_root_vol_size = knife_custom_config[:ebs_root_vol_size]
+        security_group = knife_custom_config[:security_group]
+        run_list = knife_custom_config[:runlist]
+        username = knife_custom_config[:winrm_username]
+        aws_key_path = knife_custom_config[:aws_ssh_pem_file_location]
 
         #Command to provision the instance
         provision_cmd = [
 			 "ec2_hostname",
                          "knife ec2 server create",
                          "-r #{run_list}",
-                         "-I #{ami_name}",
-                         "--flavor #{instance_size}",
                          "-G #{security_group}",
-                         "-Z #{region}",
                          "-x #{username}",
-                         "-S #{aws_key_name}",
                          "-N #{node_name}",
                          "-i #{aws_key_path}",
                          "--ebs-size #{ebs_root_vol_size}"
@@ -77,7 +70,9 @@ module Lxcos
       end
 
       def self.add_route53_dns(node_name)
-        conn = Route53::Connection.new(Chef::Config[:knife][:aws_access_key_id], Chef::Config[:knife][:aws_secret_access_key]) #opens connection
+        knife_config = Chef::Config[:knife]
+        conn = Route53::Connection.new(knife_config[:aws_access_key_id],
+                                       knife_config[:aws_secret_access_key]) #opens connection
         zone = conn.get_zones.first
         ip_of_node = Chef::Node.load(node_name)["ec2"]["public_ipv4"]
         dns_base = Route53::DNSRecord.new(node_name,"A","300", [ip_of_node], zone)
@@ -100,22 +95,15 @@ module Lxcos
         JSON.parse(container_hash)["number_of_containers"]
       end
 
-      # fetch random word and write remaining words back to the dictionary except for the random one.
       def self.get_new_name
-        words = File.open("/home/ubuntu/test-runner/runner/dictionary.rb", "r").to_a
-        random_word = words.sample
-        words_remaining = words - [random_word]
+        random_word_api_endpoint = URI('http://randomword.setgetgo.com/get.php')
+        res = Net::HTTP.get_response(random_word_api_endpoint)
         
-        if words.empty?
-          puts "Dictionary is empty."
-        else
-          dictionary = File.open("/home/ubuntu/test-runner/runner/dictionary.rb", "w")
-          words_remaining.each do |word|
-            dictionary.write(word)
-          end
-          dictionary.close
-          random_word.chomp.concat(".lxcos.io")
-        end
+        raise "Random word generator service did not " +
+              "respond while trying to generate name for node." unless (200..299).include? res.code.to_i
+
+        random_word = res.body.downcase.chomp
+        random_word.concat(".lxcos.io")
       end
 
       def self.get_active_node
